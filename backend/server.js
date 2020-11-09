@@ -4,6 +4,7 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const productRouter = require("./routes/productRoutes");
 const userRouter = require("./routes/userRoutes");
+const orderRouter = require("./routes/orderRoutes");
 const error = require("./middleware/errorMiddleware");
 const PORT = 5000;
 
@@ -19,6 +20,11 @@ app.get("/api/", (req, res) => {
 
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
+app.use("/api/orders", orderRouter);
+
+app.get("/api/config/paypal", (req, res) => {
+  res.send(process.env.PAYPAL_CLIENT_ID);
+});
 
 app.use(error.notFound);
 
