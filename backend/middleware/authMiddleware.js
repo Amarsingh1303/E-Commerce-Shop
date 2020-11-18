@@ -17,7 +17,7 @@ const checkAuthorization = asyncHandler(async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       res.status(401);
       throw new Error("Not Authorize, Token Failed");
     }
@@ -29,4 +29,14 @@ const checkAuthorization = asyncHandler(async (req, res, next) => {
   }
 });
 
-module.exports = checkAuthorization;
+const admin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    res.status(404);
+    throw new Error("Not Authorize as Admin");
+  }
+};
+
+module.exports.checkAuthorization = checkAuthorization;
+module.exports.admin = admin;
