@@ -14,15 +14,23 @@ import {
   PRODUCT_UPDATE_REQUEST,
   PRODUCT_UPDATE_SUCCESS,
   PRODUCT_UPDATE_FAIL,
+  PRODUCT_CREATE_REVIEW_REQUEST,
+  PRODUCT_CREATE_REVIEW_SUCCESS,
+  PRODUCT_CREATE_REVIEW_FAIL,
+  PRODUCT_TOP_REQUEST,
+  PRODUCT_TOP_SUCCESS,
+  PRODUCT_TOP_FAIL,
 } from "../constant/productConstant";
 import Axios from "axios";
 
-export const listProduct = () => async (dispatch) => {
+export const listProduct = (keyword = "", pageNumber = "") => async (
+  dispatch
+) => {
   try {
     dispatch({ type: PRODUCT_LIST_REQUEST });
 
     const result = await Axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}/api/products`
+      `${process.env.REACT_APP_BACKEND_URL}/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
     );
 
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: result.data });
@@ -138,6 +146,60 @@ export const updateProduct = (product) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PRODUCT_UPDATE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const createProductReview = (productId, review) => async (
+  dispatch,
+  getState
+) => {
+  try {
+    dispatch({ type: PRODUCT_CREATE_REVIEW_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    await Axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/products/${productId}/reviews`,
+      review,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      }
+    );
+
+    dispatch({ type: PRODUCT_CREATE_REVIEW_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_CREATE_REVIEW_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const listTopProduct = () => async (dispatch) => {
+  try {
+    dispatch({ type: PRODUCT_TOP_REQUEST });
+
+    const result = await Axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/products/top`
+    );
+
+    dispatch({ type: PRODUCT_TOP_SUCCESS, payload: result.data });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_TOP_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
