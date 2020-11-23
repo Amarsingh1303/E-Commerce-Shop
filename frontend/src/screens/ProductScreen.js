@@ -38,18 +38,20 @@ const ProductScreen = () => {
   const productReviewCreate = useSelector((state) => state.productReviewCreate);
   const {
     success: successProductReview,
+    loading: loadingProductReview,
     error: errorProductReview,
   } = productReviewCreate;
 
   useEffect(() => {
     if (successProductReview) {
-      alert("Review Submitted!");
       setRating(0);
       setComment("");
+    }
+    if (!product._id || product._id !== userId) {
+      dispatch(listProductDetails(userId));
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
     }
-    dispatch(listProductDetails(userId));
-  }, [userId, dispatch, successProductReview]);
+  }, [userId, dispatch, successProductReview, product._id]);
 
   const addToCartHandler = () => {
     history.push(`/cart/${userId}?qty=${qty}`);
@@ -169,6 +171,12 @@ const ProductScreen = () => {
                 ))}
                 <ListGroup.Item>
                   <h2>Write a Customer Review</h2>
+                  {successProductReview && (
+                    <Message variant="success">
+                      Review submitted successfully
+                    </Message>
+                  )}
+                  {loadingProductReview && <Loader />}
                   {errorProductReview && (
                     <Message variant="danger">{errorProductReview}</Message>
                   )}
@@ -198,7 +206,11 @@ const ProductScreen = () => {
                           onChange={(e) => setComment(e.target.value)}
                         ></Form.Control>
                       </Form.Group>
-                      <Button type="submit" variant="primary">
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={loadingProductReview}
+                      >
                         Submit
                       </Button>
                     </Form>

@@ -19,7 +19,7 @@ const checkAuthorization = asyncHandler(async (req, res, next) => {
     } catch (error) {
       // console.log(error);
       res.status(401);
-      throw new Error("Not Authorize, Token Failed");
+      throw new Error("Not authorized, token failed");
     }
   }
 
